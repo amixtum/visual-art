@@ -3,7 +3,6 @@ from math import ceil
 
 from PIL import Image, ImageDraw
 
-
 from colors import apply_color_fn, apply_find_bluest, multiply_sin
 from neighborhood import neumann
 from imageops import split_quadrants, glue_horizontal, glue_vertical

@@ -1,4 +1,4 @@
-from math import ceil
+from math import ceil, floor
 
 
 from PIL import Image, ImageDraw
@@ -151,8 +151,8 @@ def merge_interleaved_horizontal(l_img, r_img):
         
 
 def split_quadrants(img):
-    mid_x = ceil(img.width / 2)
-    mid_y = ceil(img.height / 2)
+    mid_x = floor(img.width / 2)
+    mid_y = floor(img.height / 2)
 
     top_left = Image.new(mode='RGB', size=(mid_x, mid_y))
     draw_tl = ImageDraw.Draw(top_left)

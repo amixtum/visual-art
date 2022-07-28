@@ -2,20 +2,20 @@ from math import floor
 
 
 from PIL import Image, ImageDraw
-from imageops import glue_horizontal, glue_vertical, split_quadrants
 
+
+from imageops import glue_horizontal, glue_vertical, split_quadrants
 
 from neighborhood import *
 
 from colors import *
 
 
-def compress(img):
+def compress(img) -> Image:
     new_width = int(img.width / 2)
     new_height = int(img.height / 2)
     new_img = Image.new('RGB', (new_width, new_height), color=(0, 0, 0))
     draw = ImageDraw.Draw(new_img, mode='RGB')
-    px = img.load()
 
     new_x = 0
     new_y = 0
@@ -34,7 +34,7 @@ def compress(img):
 
 
 
-def compress_recursive(img):
+def compress_recursive(img) -> Image:
     if img.width == 2 and img.height == 2:
         colors = [
             img.getpixel((0, 0)),
@@ -70,14 +70,14 @@ def compress_recursive(img):
             colors.append(img.getpixel((x, 0)))
         color = average_rgb(colors)
         return Image.new(mode='RGB', size=(ceil(img.width / 2), 1), color=color)
-    elif img.width == 2 and img.height == 3:
+    elif img.width == 2 and img.height >= 3:
         colors = []
         for y in range(img.height):
             colors.append(img.getpixel((0, y)))
             colors.append(img.getpixel((1, y)))
         color = average_rgb(colors)
         return Image.new(mode='RGB', size=(1, 2), color=color)
-    elif img.width == 3 and img.height == 2:
+    elif img.width >= 3 and img.height == 2:
         colors = []
         for x in range(img.width):
             colors.append(img.getpixel((x, 0)))

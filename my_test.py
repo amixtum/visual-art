@@ -6,7 +6,7 @@ from neighborhood import moore, neumann
 
 from PIL import Image
 
-with Image.open('img/cumulus-clouds.jpg') as img:
+with Image.open('img/flower.webp') as img:
     img.show()
     inp = input('Enter "x" to expand, "c" to compress, "q" to quit: ')
     while inp != 'q':
