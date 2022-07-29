@@ -8,52 +8,16 @@ def glue_horizontal(l_img, r_img):
     new_width = l_img.width + r_img.width
     new_height = max(l_img.height, r_img.height)
     glued = Image.new(mode='RGB', size=(new_width, new_height))
-    draw = ImageDraw.Draw(glued)
-
-    new_x = 0
-    new_y = 0
-    for x in range(l_img.width):
-        for y in range(l_img.height):
-            if new_y < new_height:
-                draw.point((new_x, new_y), fill=l_img.getpixel((x, y)))
-                new_y += 1
-        new_x += 1
-        new_y = 0
-    
-    for x in range(r_img.width):
-        for y in range(r_img.height):
-            if new_y < new_height:
-                draw.point((new_x, new_y), fill=r_img.getpixel((x, y)))
-                new_y += 1
-        new_x += 1
-        new_y = 0
-
+    glued.paste(l_img, box=(0, 0, l_img.width, new_height))
+    glued.paste(r_img, box=(l_img.width, 0, new_width, new_height))
     return glued
 
 def glue_vertical(l_img, r_img):
     new_width = max(l_img.width, r_img.width) 
     new_height = l_img.height + r_img.height
     glued = Image.new(mode='RGB', size=(new_width, new_height))
-    draw = ImageDraw.Draw(glued)
-
-    new_x = 0
-    new_y = 0
-    for y in range(l_img.height):
-        for x in range(l_img.width):
-            if new_x < new_width:
-                draw.point((new_x, new_y), fill=l_img.getpixel((x, y)))
-                new_x += 1
-        new_y += 1
-        new_x = 0
-    
-    for y in range(r_img.height):
-        for x in range(r_img.width):
-            if new_x < new_width:
-                draw.point((new_x, new_y), fill=r_img.getpixel((x, y)))
-                new_x += 1
-        new_y += 1
-        new_x = 0
-
+    glued.paste(l_img, box=(0, 0, new_width, l_img.height))
+    glued.paste(r_img, box=(0, l_img.height, new_width, new_height))
     return glued
 
 

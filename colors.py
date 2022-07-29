@@ -30,9 +30,9 @@ def find_bluest(colors, threshold, replacement):
 def multiply_sin(colors):
     color = average_rgb(colors)
     return (
-        int(color[0] - color[0] * sin((2 * pi * color[0]) / 255)), 
-        int(color[1] - color[1] * cos((2 * pi * color[1]) / 255)), 
-        int(color[2] + color[2] * sin((2 * pi * color[2]) / 255)),
+        int(color[0] + color[0] * sin(((2 * pi * color[0]) / 255) + cos((2 * pi * color[2]) / 255))), 
+        int(color[1] + color[1] * sin(((2 * pi * color[1]) / 255) + cos((2 * pi * color[1]) / 255))),
+        int(color[2] + color[2] * sin(((2 * pi * color[2]) / 255) + cos((2 * pi * color[0]) / 255))),
     )
 
 def apply_color_fn(img, color_fn, neighbor_fn):
