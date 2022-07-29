@@ -3,8 +3,8 @@ from math import ceil
 
 from PIL import Image, ImageDraw
 
-from colors import apply_color_fn, apply_find_bluest, multiply_sin
-from neighborhood import neumann
+from colors import apply_color_fn_range, apply_find_bluest, multiply_sin, apply_color_fn
+from neighborhood import neumann, moore
 from imageops import split_quadrants, glue_horizontal, glue_vertical
 
 def expand(img):
@@ -67,7 +67,7 @@ def expand_recursive(img):
         bottom = glue_horizontal(expand_recursive(quadrants[2]), expand_recursive(quadrants[3]))
         complete = glue_vertical(top, bottom)
         
-        apply_color_fn(complete, multiply_sin, neumann)
+        apply_color_fn(complete, multiply_sin, moore)
         apply_find_bluest(complete, 128, 32)
 
         for q in quadrants:

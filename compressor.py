@@ -105,4 +105,6 @@ def compress_recursive(img) -> Image:
         top = glue_horizontal(compress_recursive(quadrants[0]), compress_recursive(quadrants[1]))
         bottom = glue_horizontal(compress_recursive(quadrants[2]), compress_recursive(quadrants[3]))
         complete = glue_vertical(top, bottom)
+        apply_color_fn(complete, multiply_sin, neumann)
+        apply_find_bluest(complete, 128, 32)
         return complete
