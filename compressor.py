@@ -24,7 +24,7 @@ def compress(img) -> Image:
             neighbors = neumann(pos=[x, y], width=img.width, height=img.height)
             colors = [img.getpixel((n[0], n[1])) for n in neighbors]
             colors.append(img.getpixel((x, y)))
-            color = average_rgb(colors) 
+            color = average_rgb(colors)
             draw.point(xy=[(new_x, new_y)], fill=color)
             new_y += 1
         new_x += 1
@@ -101,10 +101,10 @@ def compress_recursive(img) -> Image:
             right = glue_vertical(quadrants[1], quadrants[3])
             complete = glue_horizontal(compress_recursive(left), compress_recursive(right))
             return complete
-        
+
         top = glue_horizontal(compress_recursive(quadrants[0]), compress_recursive(quadrants[1]))
         bottom = glue_horizontal(compress_recursive(quadrants[2]), compress_recursive(quadrants[3]))
         complete = glue_vertical(top, bottom)
-        apply_color_fn(complete, multiply_sin, moore)
+        apply_color_fn(complete, multiply_sin, neumann)
         apply_find_bluest(complete, 128, 32)
         return complete

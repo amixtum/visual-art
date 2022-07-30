@@ -8,7 +8,7 @@ from colors import apply_color_fn, apply_color_fn_recursive, apply_find_bluest, 
 from neighborhood import moore, neumann
 
 
-with Image.open('img/galaxy2.jpg') as img:
+with Image.open('img/flower.webp') as img:
     img.show()
     updated = False
     inp = input('"q" to quit: ')

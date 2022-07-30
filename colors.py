@@ -1,4 +1,4 @@
-from math import ceil, sin, cos, pi
+from math import ceil, floor, sin, cos, pi
 
 
 from PIL import Image, ImageDraw
@@ -56,12 +56,12 @@ def apply_color_fn_range(img, color_fn, neighbor_fn, x_start, y_start, x_end, y_
             draw.point((x, y), fill=color)
 
 def apply_color_fn_recursive(img, color_fn, neighbor_fn):
-    return apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, 0, 0, img.width, img.height)
+    apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, 0, 0, img.width, img.height, True)
 
-def apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_start, y_start, x_end, y_end):
+def apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_start, y_start, x_end, y_end, flip):
     draw = ImageDraw.Draw(img)
     if x_end - x_start == 1 and y_end - y_start == 1:
-        neighbors = neumann(pos=(x_start, y_start), width=img.width, height=img.height)
+        neighbors = neighbor_fn(pos=(x_start, y_start), width=img.width, height=img.height)
         colors = [img.getpixel((n[0], n[1])) for n in neighbors]
         colors.append(img.getpixel((x_start, y_start)))
         color = color_fn(colors)
@@ -69,7 +69,7 @@ def apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_start, y_start
 
     elif x_end - x_start == 1:
         for y in range(y_start, y_end):
-            neighbors = neumann(pos=(x_start, y), width=img.width, height=img.height)
+            neighbors = neighbor_fn(pos=(x_start, y), width=img.width, height=img.height)
             colors = [img.getpixel((n[0], n[1])) for n in neighbors]
             colors.append(img.getpixel((x_start, y)))
             color = color_fn(colors)
@@ -77,22 +77,26 @@ def apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_start, y_start
 
     elif y_end - y_start == 1:
         for x in range(x_start, x_end):
-            neighbors = neumann(pos=(x, y_start), width=img.width, height=img.height)
+            neighbors = neighbor_fn(pos=(x, y_start), width=img.width, height=img.height)
             colors = [img.getpixel((n[0], n[1])) for n in neighbors]
             colors.append(img.getpixel((x, y_start)))
             color = color_fn(colors)
             draw.point((x, y_start), fill=color)
 
     else:
-        x_mid = ceil((x_end - x_start)/ 2) + x_start
-        y_mid = ceil((y_end - y_start) / 2) + y_start
+        x_mid = floor((x_end - x_start)/ 2) + x_start
+        y_mid = floor((y_end - y_start) / 2) + y_start
 
-        apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_start, y_start, x_mid, y_mid)
-        apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_mid, y_start, x_end, y_mid)
-        apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_start, y_mid, x_mid, y_end)
-        apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_mid, y_mid, x_end, y_end)
-
-        apply_color_fn_range(img, color_fn, neighbor_fn, x_start, y_start, x_end, y_end)
+        if flip:
+            apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_start, y_start, x_mid, y_mid, False)
+            apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_mid, y_mid, x_end, y_end, False)
+            apply_color_fn_range(img, color_fn, neighbor_fn, x_start, y_mid, x_mid, y_end)
+            apply_color_fn_range(img, color_fn, neighbor_fn, x_mid, y_start, x_end, y_mid)
+        else:
+            apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_start, y_mid, x_mid, y_end, True)
+            apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_mid, y_start, x_end, y_mid, True)
+            apply_color_fn_range(img, color_fn, neighbor_fn, x_start, y_start, x_mid, y_mid)
+            apply_color_fn_range(img, color_fn, neighbor_fn, x_mid, y_mid, x_end, y_end)
 
 def apply_find_bluest(img, threshold, replacement):
     draw = ImageDraw.Draw(img)
