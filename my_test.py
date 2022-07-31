@@ -3,14 +3,16 @@ from PIL import Image
 
 
 from compressor import compress, compress_recursive
-from expander import expand, expand_recursive
-from colors import apply_color_fn, apply_color_fn_recursive, apply_find_bluest, apply_color_fn_range, average_rgb, multiply_sin, apply_find_bluest_recursive
+from expander import my_expand, expand, expand_recursive
+from colors import ColorWave, apply_color_fn, apply_color_fn_recursive, apply_find_bluest, apply_color_fn_range, average_rgb, multiply_sin, apply_find_bluest_recursive
 from neighborhood import moore, neumann
 
 
 with Image.open('img/flower.webp') as img:
     img.show()
     updated = False
+
+    color_wav = ColorWave(8, 0.5, 2)
     inp = input('"q" to quit: ')
     while inp != 'q':
         if inp == 'c':
@@ -39,7 +41,7 @@ with Image.open('img/flower.webp') as img:
         elif inp[0] == 'c' and inp[1] == 'l':
             n = int(inp[2])
             for _ in range(n):
-                apply_color_fn(img, multiply_sin, neumann)
+                apply_color_fn(img, color_wav.get_color, neumann)
             updated = True
         if updated:
             img.show()

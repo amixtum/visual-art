@@ -1,13 +1,18 @@
 from math import ceil
 
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageChops, ImageOps
 
 from colors import apply_color_fn_range, apply_find_bluest, multiply_sin, apply_color_fn
 from neighborhood import neumann, moore
 from imageops import split_quadrants, glue_horizontal, glue_vertical
 
+
+# expands image by factor of 2
 def expand(img):
+    return ImageOps.scale(img, 2.0)
+
+def my_expand(img):
     newWidth = int(img.width * 2)
     newHeight = int(img.height * 2)
     new_img = Image.new(mode='RGB', size=(newWidth, newHeight))
@@ -63,13 +68,19 @@ def expand_recursive(img):
         return new_img
     else:
         quadrants = split_quadrants(img) 
-        top = glue_horizontal(expand_recursive(quadrants[0]), expand_recursive(quadrants[1])) 
-        bottom = glue_horizontal(expand_recursive(quadrants[2]), expand_recursive(quadrants[3]))
+        new_quads = []
+
+        for i in range(len(quadrants)):
+            if i % 2 == 0:
+                new_quads.append(ImageOps.flip(quadrants[i]))
+            else:
+                new_quads.append(ImageOps.mirror(quadrants[i]))
+            new_quads[i] = ImageOps.fit(image=new_quads[i], size=(quadrants[i].width, quadrants[i].height))
+
+        top = glue_horizontal(expand_recursive(new_quads[0]), expand_recursive(new_quads[1])) 
+        bottom = glue_horizontal(expand_recursive(new_quads[2]), expand_recursive(new_quads[3]))
         complete = glue_vertical(top, bottom)
         
-        apply_color_fn(complete, multiply_sin, moore)
-        apply_find_bluest(complete, 128, 32)
-
         for q in quadrants:
             q.close()
         top.close()

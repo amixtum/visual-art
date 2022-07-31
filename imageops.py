@@ -22,97 +22,10 @@ def glue_vertical(l_img, r_img):
 
 
 def merge_interleaved_vertical(l_img, r_img):
-    new_width = min(l_img.width, r_img.width) 
-    new_height = l_img.height + r_img.height
-    merged = Image.new(mode='RGB', size=(new_width, new_height))
-    draw = ImageDraw.Draw(merged)
-
-    l_x = 0
-    l_y = 0
-    r_x = 0
-    r_y = 0
-    use_left = True
-    l_done = False
-    r_done = False
-    color = (0, 0, 0)
-    for x in range(new_width):
-        for y in range(new_height):
-            if use_left and not l_done and l_y < l_img.height:
-                color = l_img.getpixel((l_x, l_y))
-                l_y += 1
-                if r_y <= r_img.height - 1:
-                    use_left = False
-            elif (not use_left) and (not r_done) and r_y < r_img.height:
-                color = r_img.getpixel((r_x, r_y))
-                r_y += 1
-                if l_y <= l_img.height - 1:
-                    use_left = True
-            else:
-                color = (0, 0, 0)
-            draw.point((x, y), fill=color)
-        if l_x < l_img.width - 1:
-            l_x += 1
-        else:
-            if not l_done:
-                l_done = True
-
-        if r_x < r_img.width - 1:
-            r_x += 1
-        else:
-            if not r_done:
-                r_done = True
-
-        l_y = 0
-        r_y = 0
-
-    return merged
+    pass
 
 def merge_interleaved_horizontal(l_img, r_img):
-    new_width = l_img.width + r_img.width 
-    new_height = min(l_img.height, r_img.height)
-    merged = Image.new(mode='RGB', size=(new_width, new_height))
-    draw = ImageDraw.Draw(merged)
-
-    l_x = 0
-    l_y = 0
-    r_x = 0
-    r_y = 0
-    use_left = True
-    l_done = False
-    r_done = False
-    color = (0, 0, 0)
-    for y in range(new_height):
-        for x in range(new_width):
-            if use_left and not l_done and l_x < l_img.width:
-                color = l_img.getpixel((l_x, l_y))
-                l_x += 1
-                if r_x <= r_img.width - 1:
-                    use_left = False
-            elif (not use_left) and (not r_done) and r_x < r_img.width:
-                color = r_img.getpixel((r_x, r_y))
-                r_x += 1
-                if l_x <= l_img.width - 1:
-                    use_left = True
-            else:
-                color = (0, 0, 0)
-            draw.point((x, y), fill=color)
-        if l_y < l_img.height - 1:
-            l_y += 1
-        else:
-            if not l_done:
-                l_done = True
-
-        if r_y < r_img.height - 1:
-            r_y += 1
-        else:
-            if not r_done:
-                r_done = True
-
-        l_x = 0
-        r_x = 0
-
-    return merged
-        
+    pass        
 
 def split_quadrants(img):
     mid_x = floor(img.width / 2)

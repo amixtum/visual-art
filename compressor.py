@@ -1,7 +1,8 @@
+from email.mime import audio
 from math import floor
 
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageOps
 
 
 from imageops import glue_horizontal, glue_vertical, split_quadrants
@@ -10,8 +11,10 @@ from neighborhood import *
 
 from colors import *
 
-
 def compress(img) -> Image:
+    return ImageOps.scale(img, 0.5)
+
+def my_compress(img) -> Image:
     new_width = int(img.width / 2)
     new_height = int(img.height / 2)
     new_img = Image.new('RGB', (new_width, new_height), color=(0, 0, 0))
@@ -102,9 +105,17 @@ def compress_recursive(img) -> Image:
             complete = glue_horizontal(compress_recursive(left), compress_recursive(right))
             return complete
 
-        top = glue_horizontal(compress_recursive(quadrants[0]), compress_recursive(quadrants[1]))
-        bottom = glue_horizontal(compress_recursive(quadrants[2]), compress_recursive(quadrants[3]))
+        new_quads = []
+
+        new_quads.append(quadrants[0])
+        new_quads.append(ImageOps.mirror(quadrants[1]))
+        new_quads.append(ImageOps.flip(quadrants[2]))
+        new_quads.append(ImageOps.mirror(quadrants[3]))
+
+        for i in range(len(quadrants)):
+            new_quads[i] = ImageOps.fit(image=new_quads[i], size=(quadrants[i].width, quadrants[i].height))
+
+        top = glue_horizontal(compress_recursive(new_quads[0]), compress_recursive(new_quads[1]))
+        bottom = glue_horizontal(compress_recursive(new_quads[2]), compress_recursive(new_quads[3]))
         complete = glue_vertical(top, bottom)
-        apply_color_fn(complete, multiply_sin, neumann)
-        apply_find_bluest(complete, 128, 32)
         return complete
