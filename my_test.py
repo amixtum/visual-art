@@ -8,7 +8,7 @@ from colors import ColorWave, apply_color_fn, apply_color_fn_recursive, apply_fi
 from neighborhood import moore, neumann
 
 
-with Image.open('img/flower.webp') as img:
+with Image.open('img/galaxy1.jpg') as img:
     img.show()
     updated = False
 
@@ -41,7 +41,7 @@ with Image.open('img/flower.webp') as img:
         elif inp[0] == 'c' and inp[1] == 'l':
             n = int(inp[2])
             for _ in range(n):
-                apply_color_fn(img, color_wav.get_color, neumann)
+                apply_color_fn(img, multiply_sin, neumann)
             updated = True
         if updated:
             img.show()

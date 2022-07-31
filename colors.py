@@ -46,16 +46,7 @@ class ColorWave:
 
     def get_color(self, colors: list[tuple[int, int, int]]) -> tuple[int, int, int]:
         color = [0, 0, 0]
-        for c in colors:
-            color[0] += c[0] + (c[0] * self.get_value())
-            self.increment_phase()
-            color[1] += c[1] + (c[1] * self.get_value())
-            self.increment_phase()
-            color[2] += c[2] + (c[2] * self.get_value())
-            self.increment_phase()
-        
-        color = [int(((c / len(colors)) + c * self.get_value()) / 2) for c in color]
-        
+        # do something here        
         return (color[0], color[1], color[2])
 
 
