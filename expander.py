@@ -80,11 +80,6 @@ def expand_recursive(img):
         top = glue_horizontal(expand_recursive(new_quads[0]), expand_recursive(new_quads[1])) 
         bottom = glue_horizontal(expand_recursive(new_quads[2]), expand_recursive(new_quads[3]))
         complete = glue_vertical(top, bottom)
-        
-        for q in quadrants:
-            q.close()
-        top.close()
-        bottom.close()
 
         return complete
 
