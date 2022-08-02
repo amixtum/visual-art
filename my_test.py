@@ -6,8 +6,7 @@ from compressor import compress, compress_recursive
 from expander import my_expand, expand, expand_recursive
 from colors import ColorWave, apply_color_fn, apply_color_fn_recursive, apply_find_bluest, apply_color_fn_range, average_rgb, multiply_sin, apply_find_bluest_recursive
 from neighborhood import moore, neumann
-from drawing import draw_line, draw_lines_outward
-
+from drawing import draw_line
 
 with Image.open('img/galaxy1.jpg') as img:
     img.show()
