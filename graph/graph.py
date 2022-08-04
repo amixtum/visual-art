@@ -187,9 +187,10 @@ class graph:
             for index in indices:
                 self.remove_edge(vertex, self.edges(vertex).pop(index))
                 self.add_edge(vertex, random_edge[0])
-        self.remove_vertex(random_edge[1])
         for e in edges_to_absorb:
+            self.remove_edge(random_edge[1], e)
             self.add_edge(random_edge[0], e)
+        self.remove_vertex(random_edge[1])
         
         # remove self loops
         for _ in range(self.edges(random_edge[0]).count(random_edge[0])):
@@ -200,9 +201,10 @@ class graph:
 
         self.remove_edge_undirected(random_edge[0], random_edge[1])
         edges_to_absorb = self.edges(random_edge[1])
-        self.remove_vertex(random_edge[1])
         for e in edges_to_absorb:
+            self.remove_edge_undirected(random_edge[1], e)
             self.add_edge_undirected(random_edge[0], e)
+        self.remove_vertex(random_edge[1])
         
         # remove self loops
         while random_edge[0] in self.graph[random_edge[0]]:
