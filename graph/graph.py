@@ -1,3 +1,4 @@
+import heapq
 from math import inf
 from queue import Queue
 from random import choice
@@ -242,45 +243,44 @@ class graph:
             r.append(self.graph[v])
         return r
 
+    # not effecient
     def djikstra(self, start_vertex):
-        processed = [start_vertex]
+        processed = {}
+        processed[start_vertex] = True
+        unprocessed = []
+
         distances = {start_vertex: 0}
-        paths = {start_vertex: []}
-        done = {}
+        key = {}
+
         finished = False
 
+        for vertex in self.vertices():
+            distances[vertex] = inf
+            processed[vertex] = False
+            key[vertex] = inf
+
+        for end_vertex in self.edges(start_vertex):
+            heapq.heappush(unprocessed, (distances[start_vertex] + self.weight(start_vertex, end_vertex), (start_vertex, end_vertex)))
+
         while not finished:
-            greedy_criterion = inf
-            min_edge = None
-            greedy_criterion_edge = None
-            temp = inf
+            if len(unprocessed) > 0:
+                min_edge = heapq.heappop(unprocessed)[1]
+                processed[min_edge[1]] = True
+                distances[min_edge[1]] = distances[min_edge[0]] + self.weight(min_edge[0], min_edge[1])
 
-            for p_vertex in processed:
-                if not done[p_vertex]:
-                    unprocessed_edges = []
+                for end_vertex in self.edges(min_edge[1]):
+                    distance = distances[min_edge[1]] + self.weight(min_edge[1], end_vertex)
+                    if distance < key[end_vertex]:
+                        key[end_vertex] = distance
 
-                    for edge in self.edges(p_vertex):
-                        if edge not in processed:
-                            unprocessed_edges.append(edge)
+                    if end_vertex in unprocessed:
+                        for s_vertex in self.edges_inward(end_vertex):
+                            if processed[s_vertex]:
+                                unprocessed.remove((distances[s_vertex] + self.weight(s_vertex, end_vertex), (s_vertex, end_vertex)))
+                        heapq.heapify(unprocessed)
 
-                    if len(unprocessed_edges) == 0:
-                        done[p_vertex] = True
-
-                    for edge in unprocessed_edges: 
-                        val = distances[p_vertex] + self.weight(p_vertex, edge)
-                        if val < temp:
-                            temp = val
-                            min_edge = (p_vertex, edge)
-
-                    if temp < greedy_criterion:
-                        greedy_criterion = temp
-                        greedy_criterion_edge = min_edge
-                
-            if greedy_criterion_edge[1] not in processed:
-                processed.append(greedy_criterion_edge[1])
-                distances[greedy_criterion_edge[1]] = distances[greedy_criterion_edge[0]] + self.weight(greedy_criterion_edge[0], greedy_criterion_edge[1])
-                paths[greedy_criterion_edge[1]] = paths[greedy_criterion_edge[0]] + [greedy_criterion_edge[0], greedy_criterion_edge[1]]
+                    heapq.heappush(unprocessed, (distance, (min_edge[1], end_vertex)))
             else:
                 finished = True
-        
-        return (distances, paths)
+                        
+        return distances
