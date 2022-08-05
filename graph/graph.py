@@ -247,7 +247,7 @@ class graph:
         distances = {start_vertex: 0}
         paths = {start_vertex: []}
         done = {}
-        finished = False 
+        finished = False
 
         while not finished:
             greedy_criterion = inf

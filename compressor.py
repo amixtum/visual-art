@@ -105,17 +105,11 @@ def compress_recursive(img) -> Image:
             complete = glue_horizontal(compress_recursive(left), compress_recursive(right))
             return complete
 
-        new_quads = []
-
-        new_quads.append(quadrants[0])
-        new_quads.append(ImageOps.mirror(quadrants[1]))
-        new_quads.append(ImageOps.flip(quadrants[2]))
-        new_quads.append(ImageOps.mirror(quadrants[3]))
-
-        for i in range(len(quadrants)):
-            new_quads[i] = ImageOps.fit(image=new_quads[i], size=(quadrants[i].width, quadrants[i].height))
-
-        top = glue_horizontal(compress_recursive(new_quads[0]), compress_recursive(new_quads[1]))
-        bottom = glue_horizontal(compress_recursive(new_quads[2]), compress_recursive(new_quads[3]))
+        top = glue_horizontal(compress_recursive(quadrants[0]), compress_recursive(quadrants[1]))
+        bottom = glue_horizontal(compress_recursive(quadrants[2]), compress_recursive(quadrants[3]))
         complete = glue_vertical(top, bottom)
+        
+        apply_color_fn_recursive(complete, multiply_sin, neumann)
+        apply_color_fn_recursive(complete, lambda colors: remove_and_replace(colors, 128, 32), neumann)
+
         return complete

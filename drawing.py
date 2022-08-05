@@ -5,7 +5,7 @@ from random import choice, random
 from PIL import Image, ImageDraw
 
 
-from colors import find_bluest, multiply_sin
+from colors import remove_and_replace, multiply_sin
 from neighborhood import neumann, moore
 
 

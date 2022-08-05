@@ -60,22 +60,23 @@ def average_rgb(colors):
 
     return (int(sum[0] / len(colors)), int(sum[1] / len(colors)), int(sum[2] / len(colors)))
 
-def find_bluest(colors, threshold, replacement):
+def remove_and_replace(colors, threshold, replacement):
     bluest_color = colors[0]
     for c in colors:
-        if c[2] > bluest_color[2]:
-            bluest_color = c
+        if (c[0] != 0 and c[1] != 0 and c[2] != 0) and (bluest_color[0] != 0 and bluest_color[1] != 0 and bluest_color[2] != 0):
+            if c[2] / (c[0] + c[1] + c[2]) > bluest_color[2] / (bluest_color[0] + bluest_color[1] + bluest_color[2]):
+                bluest_color = c
     if bluest_color[2] >= threshold:
-        return (bluest_color[0], bluest_color[1], 0)
+        return (bluest_color[0] - int(replacement * (replacement / threshold)), bluest_color[1], 0)
     else:
-        return (bluest_color[0], bluest_color[1], bluest_color[2] + replacement)
+        return (bluest_color[0] + int(replacement * (replacement / threshold)), bluest_color[1], bluest_color[2] + replacement)
 
 def multiply_sin(colors):
     color = average_rgb(colors)
     return (
-        int(color[0] + color[0] * sin(((2 * pi * color[0]) / 255) + (color[0] / 255) * cos((2 * pi * color[2]) / 255))), 
+        int(color[0] + color[0] * sin(((2 * pi * color[0]) / 255) + (color[2] / 255) * cos((2 * pi * color[2]) / 255))), 
         int(color[1] + color[1] * sin(((2 * pi * color[1]) / 255) + (color[1] / 255) * cos((2 * pi * color[1]) / 255))),
-        int(color[2] + color[2] * sin(((2 * pi * color[2]) / 255) + (color[2] / 255) * cos((2 * pi * color[0]) / 255))),
+        int(color[2] + color[2] * sin(((2 * pi * color[2]) / 255) + (color[0] / 255) * cos((2 * pi * color[0]) / 255))),
     )
 
 def apply_color_fn(img, color_fn, neighbor_fn):
@@ -127,8 +128,8 @@ def apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_start, y_start
             draw.point((x, y_start), fill=color)
 
     else:
-        x_mid = floor((x_end - x_start)/ 2) + x_start
-        y_mid = floor((y_end - y_start) / 2) + y_start
+        x_mid = ceil((x_end - x_start)/ 2) + x_start
+        y_mid = ceil((y_end - y_start) / 2) + y_start
 
         if flip:
             apply_color_fn_recursive_helper(img, color_fn, neighbor_fn, x_start, y_start, x_mid, y_mid, False)
@@ -148,7 +149,7 @@ def apply_find_bluest(img, threshold, replacement):
             neighbors = neumann(pos=[x, y], width=img.width, height=img.height) 
             colors = [img.getpixel((n[0], n[1])) for n in neighbors]
             colors.append(img.getpixel((x, y)))
-            color = find_bluest(colors, threshold, replacement)
+            color = remove_and_replace(colors, threshold, replacement)
             draw.point((x, y), fill=color)
 
 def apply_find_bluest_range(img, threshold, replacement, x_start, y_start, x_end, y_end):
@@ -158,7 +159,7 @@ def apply_find_bluest_range(img, threshold, replacement, x_start, y_start, x_end
             neighbors = moore(pos=(x, y), width=img.width, height=img.height)
             colors = [img.getpixel((n[0], n[1])) for n in neighbors]
             colors.append(img.getpixel((x, y)))
-            color = find_bluest(colors, threshold, replacement)
+            color = remove_and_replace(colors, threshold, replacement)
             draw.point((x, y), fill=color)
 
 def apply_find_bluest_recursive(img, threshold, replacement):
@@ -170,7 +171,7 @@ def apply_find_bluest_recursive_helper(img: Image, threshold: int, replacement: 
         neighbors = moore(pos=(x_start, y_start), width=img.width, height=img.height)
         colors = [img.getpixel((n[0], n[1])) for n in neighbors]
         colors.append(img.getpixel((x_start, y_start)))
-        color = find_bluest(colors, threshold, replacement)
+        color = remove_and_replace(colors, threshold, replacement)
         draw.point((x_start, y_start), fill=color)
 
     elif x_end - x_start == 1:
@@ -178,7 +179,7 @@ def apply_find_bluest_recursive_helper(img: Image, threshold: int, replacement: 
             neighbors = moore(pos=(x_start, y), width=img.width, height=img.height)
             colors = [img.getpixel((n[0], n[1])) for n in neighbors]
             colors.append(img.getpixel((x_start, y)))
-            color = find_bluest(colors, threshold, replacement)
+            color = remove_and_replace(colors, threshold, replacement)
             draw.point((x_start, y), fill=color)
 
     elif y_end - y_start == 1:
@@ -186,7 +187,7 @@ def apply_find_bluest_recursive_helper(img: Image, threshold: int, replacement: 
             neighbors = moore(pos=(x, y_start), width=img.width, height=img.height)
             colors = [img.getpixel((n[0], n[1])) for n in neighbors]
             colors.append(img.getpixel((x, y_start)))
-            color = find_bluest(colors, threshold, replacement)
+            color = remove_and_replace(colors, threshold, replacement)
             draw.point((x, y_start), fill=color)
 
     else:
