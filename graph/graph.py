@@ -246,12 +246,12 @@ class graph:
     # not effecient
     def djikstra(self, start_vertex):
         processed = {}
-        processed[start_vertex] = True
 
         # heap
         unprocessed = []
 
-        distances = {start_vertex: 0}
+        distances = {}
+
         key = {}
 
         finished = False
@@ -260,6 +260,10 @@ class graph:
             distances[vertex] = inf
             processed[vertex] = False
             key[vertex] = inf
+        
+        key[start_vertex] = 0
+        processed[start_vertex] = True
+        distances[start_vertex] = 0
 
         for end_vertex in self.edges(start_vertex):
             heapq.heappush(unprocessed, (distances[start_vertex] + self.weight(start_vertex, end_vertex), (start_vertex, end_vertex)))
@@ -269,17 +273,13 @@ class graph:
                 min_edge = heapq.heappop(unprocessed)[1]
                 processed[min_edge[1]] = True
                 distances[min_edge[1]] = distances[min_edge[0]] + self.weight(min_edge[0], min_edge[1])
+                key[min_edge[1]] = distances[min_edge[1]]
 
                 for end_vertex in self.edges(min_edge[1]):
                     distance = distances[min_edge[1]] + self.weight(min_edge[1], end_vertex)
                     if distance < key[end_vertex]:
                         key[end_vertex] = distance
-
-                    if end_vertex in unprocessed:
-                        for s_vertex in self.edges_inward(end_vertex):
-                            if processed[s_vertex]:
-                                unprocessed.remove((distances[s_vertex] + self.weight(s_vertex, end_vertex), (s_vertex, end_vertex)))
-                        heapq.heapify(unprocessed)
+                    if not processed[end_vertex]:
                         heapq.heappush(unprocessed, (distance, (min_edge[1], end_vertex)))
             else:
                 finished = True
