@@ -243,7 +243,7 @@ class graph:
             r.append(self.graph[v])
         return r
 
-    # not effecient
+    # not sure if O(nlogn)
     def djikstra(self, start_vertex):
         processed = {}
 
@@ -273,13 +273,14 @@ class graph:
                 min_edge = heapq.heappop(unprocessed)[1]
                 processed[min_edge[1]] = True
                 distances[min_edge[1]] = distances[min_edge[0]] + self.weight(min_edge[0], min_edge[1])
-                key[min_edge[1]] = distances[min_edge[1]]
+                if distances[min_edge[1]] < key[min_edge[1]]:
+                    key[min_edge[1]] = distances[min_edge[1]]
 
                 for end_vertex in self.edges(min_edge[1]):
-                    distance = distances[min_edge[1]] + self.weight(min_edge[1], end_vertex)
-                    if distance < key[end_vertex]:
-                        key[end_vertex] = distance
                     if not processed[end_vertex]:
+                        distance = distances[min_edge[1]] + self.weight(min_edge[1], end_vertex)
+                        if distance < key[end_vertex]:
+                            key[end_vertex] = distance
                         heapq.heappush(unprocessed, (distance, (min_edge[1], end_vertex)))
             else:
                 finished = True
