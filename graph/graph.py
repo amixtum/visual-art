@@ -6,6 +6,7 @@ from random import choice
 class graph:
     def __init__(self) -> None:
         self.graph = {}
+        self.edge_weights = {}
         self.dfs_label = 0
         self.current_source_vertex = None
         self.finishing_time = 0
@@ -15,23 +16,34 @@ class graph:
     
     def remove_vertex(self, vertex):
         self.graph.pop(vertex)
-        for adj_list in self.graph.values:
-            while vertex in adj_list:
-                adj_list.remove(vertex)
+        for edge in self.edges(vertex):
+            self.edge_weights.pop((vertex, edge))
+        for v in self.vertices():
+            while vertex in self.edges(v):
+                self.edge_weights.pop((v, vertex))
+        for v in self.vertices():
+            while vertex in self.edges(v):
+                self.edges(v).remove(vertex)
     
-    def add_edge(self, from_vertex, to_vertex):
+    def add_edge(self, from_vertex, to_vertex, weight):
         self.graph[from_vertex].append(to_vertex)
+        self.edge_weights[(from_vertex, to_vertex)] = weight
     
-    def add_edge_undirected(self, from_vertex, to_vertex):
+    def add_edge_undirected(self, from_vertex, to_vertex, weight):
         self.add_edge(from_vertex, to_vertex)
         self.add_edge(to_vertex, from_vertex)
+        self.edge_weights[(from_vertex, to_vertex)] = weight
+        self.edge_weights[(to_vertex, from_vertex)] = weight
     
     def remove_edge(self, from_vertex, to_vertex):
         self.graph[from_vertex].remove(to_vertex)
+        self.edge_weights.pop((from_vertex, to_vertex))
 
     def remove_edge_undirected(self, from_vertex, to_vertex):
         self.remove_edge(self, from_vertex, to_vertex)
         self.remove_edge(self, to_vertex, from_vertex)
+        self.edge_weights.pop((from_vertex, to_vertex))
+        self.edge_weights.pop((to_vertex, from_vertex))
     
     def vertices(self) -> list:
         return self.graph.keys
@@ -46,7 +58,6 @@ class graph:
                 if edge == vertex:
                     edges.append(v)
         return edges
-
     
     def count_vertices(self):
         return len(self.graph.keys)
@@ -56,12 +67,15 @@ class graph:
 
     def degree(self, vertex):
         d = 0
-        for v in self.graph.items:
-            if v[0] != vertex:
-                for e in v[1]:
+        for v in self.vertices():
+            if v != vertex:
+                for e in self.edges(v):
                     if e == vertex:
                         d += 1
         return d
+
+    def weight(self, from_vertex, to_vertex):
+        return self.edge_weights((from_vertex, to_vertex))
 
     def copy(self):
         c = graph()
@@ -71,7 +85,7 @@ class graph:
             for edge in self.graph[vertex]:
                 c.add_edge(vertex, edge)
         return c 
-
+    
     def dfs(self, start_vertex, visited: dict = {}, connected: list = [], labels: dict = {}, finishing_times: dict = {}):
         if len(visited) == 0:
             for vertex in self.vertices():
@@ -227,3 +241,46 @@ class graph:
         for v in self.graph.keys:
             r.append(self.graph[v])
         return r
+
+    def djikstra(self, start_vertex):
+        processed = [start_vertex]
+        distances = {start_vertex: 0}
+        paths = {start_vertex: []}
+        done = {}
+        finished = False 
+
+        while not finished:
+            greedy_criterion = inf
+            min_edge = None
+            greedy_criterion_edge = None
+            temp = inf
+
+            for p_vertex in processed:
+                if not done[p_vertex]:
+                    unprocessed_edges = []
+
+                    for edge in self.edges(p_vertex):
+                        if edge not in processed:
+                            unprocessed_edges.append(edge)
+
+                    if len(unprocessed_edges) == 0:
+                        done[p_vertex] = True
+
+                    for edge in unprocessed_edges: 
+                        val = distances[p_vertex] + self.weight(p_vertex, edge)
+                        if val < temp:
+                            temp = val
+                            min_edge = (p_vertex, edge)
+
+                    if temp < greedy_criterion:
+                        greedy_criterion = temp
+                        greedy_criterion_edge = min_edge
+                
+            if greedy_criterion_edge[1] not in processed:
+                processed.append(greedy_criterion_edge[1])
+                distances[greedy_criterion_edge[1]] = distances[greedy_criterion_edge[0]] + self.weight(greedy_criterion_edge[0], greedy_criterion_edge[1])
+                paths[greedy_criterion_edge[1]] = paths[greedy_criterion_edge[0]] + [greedy_criterion_edge[0], greedy_criterion_edge[1]]
+            else:
+                finished = True
+        
+        return (distances, paths)
