@@ -247,6 +247,8 @@ class graph:
     def djikstra(self, start_vertex):
         processed = {}
         processed[start_vertex] = True
+
+        # heap
         unprocessed = []
 
         distances = {start_vertex: 0}
@@ -278,9 +280,8 @@ class graph:
                             if processed[s_vertex]:
                                 unprocessed.remove((distances[s_vertex] + self.weight(s_vertex, end_vertex), (s_vertex, end_vertex)))
                         heapq.heapify(unprocessed)
-
-                    heapq.heappush(unprocessed, (distance, (min_edge[1], end_vertex)))
+                        heapq.heappush(unprocessed, (distance, (min_edge[1], end_vertex)))
             else:
                 finished = True
                         
-        return distances
+        return key
