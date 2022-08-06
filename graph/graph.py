@@ -4,30 +4,40 @@ from queue import Queue
 from random import choice
 
 
-class graph(object):
+class graph:
     def __init__(self):
-        self.graph = {}
+        self.adjacency_matrix = {}
+        self.adjacency_lists = {}
         self.edge_weights = {}
         self.dfs_label = 0
         self.current_source_vertex = None
         self.finishing_time = 0
 
     def add_vertex(self, vertex) -> None:
-        self.graph[vertex] = []
+        self.adjacency_matrix[vertex] = {}
+
+        self.adjacency_lists[vertex] = []
+
+        for v in self.vertices():
+            self.adjacency_matrix[vertex][v] = False
+            self.adjacency_matrix[v][vertex] = False
     
     def remove_vertex(self, vertex):
-        for edge in self.edges(vertex):
-            self.edge_weights.pop((vertex, edge))
         for v in self.vertices():
-            while vertex in self.edges(v):
-                self.edge_weights.pop((v, vertex))
-        for v in self.vertices():
-            while vertex in self.edges(v):
-                self.edges(v).remove(vertex)
-        self.graph.pop(vertex)
+            for _ in range(self.adjacency_lists[v].count(vertex)):
+                self.adjacency_lists[v].remove(vertex)
+
+            self.adjacency_matrix[v].pop(vertex)
+
+        self.adjacency_lists.pop(vertex)
+
+        self.adjacency_matrix.pop(vertex)
     
     def add_edge(self, from_vertex, to_vertex, weight):
-        self.graph[from_vertex].append(to_vertex)
+        self.adjacency_lists[from_vertex].append(to_vertex)
+
+        self.adjacency_matrix[from_vertex][to_vertex] = True
+
         self.edge_weights[(from_vertex, to_vertex)] = weight
     
     def add_edge_undirected(self, from_vertex, to_vertex, weight):
@@ -37,8 +47,8 @@ class graph(object):
         self.edge_weights[(to_vertex, from_vertex)] = weight
     
     def remove_edge(self, from_vertex, to_vertex):
-        self.graph[from_vertex].remove(to_vertex)
-        self.edge_weights.pop((from_vertex, to_vertex))
+        self.adjacency_lists[from_vertex].remove(to_vertex)
+        self.adjacency_matrix[from_vertex][to_vertex] = False
 
     def remove_edge_undirected(self, from_vertex, to_vertex):
         self.remove_edge(self, from_vertex, to_vertex)
@@ -47,43 +57,39 @@ class graph(object):
         self.edge_weights.pop((to_vertex, from_vertex))
     
     def vertices(self) -> list:
-        return list(self.graph.keys())
+        return list(self.adjacency_matrix.keys())
 
     def edges(self, vertex) -> list:
-        return self.graph[vertex]
+        return self.adjacency_lists[vertex]
     
     def edges_inward(self, vertex) -> list:
         edges = []
         for v in self.vertices():
-            for edge in self.edges(v):
-                if edge == vertex:
-                    edges.append(v)
+            if self.has_edge(v, vertex):
+                edges.append(v)
         return edges
     
+    def has_edge(self, from_vertex, to_vertex):
+        return self.adjacency_matrix[from_vertex][to_vertex]
+    
     def count_vertices(self):
-        return len(self.graph.keys)
+        return len(self.adjacency_matrix.keys)
     
     def count_edges(self):
-        return sum([len(adj_list) for adj_list in self.graph.values])
+        return sum([len(adj_list) for adj_list in self.adjacency_matrix.values])
 
     def degree(self, vertex):
-        d = 0
-        for v in self.vertices():
-            if v != vertex:
-                for e in self.edges(v):
-                    if e == vertex:
-                        d += 1
-        return d
+        return sum([self.edges(v).count(vertex) for v in self.vertices()])
 
     def weight(self, from_vertex, to_vertex):
         return self.edge_weights[(from_vertex, to_vertex)]
 
     def copy(self):
         c = graph()
-        for vertex in self.graph.keys:
+        for vertex in self.adjacency_matrix.keys:
             c.add_vertex(vertex)
-        for vertex in self.graph.keys:
-            for edge in self.graph[vertex]:
+        for vertex in self.adjacency_matrix.keys:
+            for edge in self.adjacency_matrix[vertex]:
                 c.add_edge(vertex, edge)
         return c 
     
@@ -184,8 +190,8 @@ class graph(object):
         return connected_component
 
     def choose_random_edge(self):
-        start = choice(list(self.graph.keys()))
-        end = choice(self.graph[start])
+        start = choice(list(self.adjacency_lists.keys()))
+        end = choice(self.adjacency_lists[start])
         return (start, end)
 
     def contract_random(self):
@@ -210,6 +216,32 @@ class graph(object):
         # remove self loops
         for _ in range(self.edges(random_edge[0]).count(random_edge[0])):
             self.remove_edge(random_edge[0], random_edge[0])
+    
+    def contract_random_no_parallel(self):
+        random_edge = self.choose_random_edge()
+
+        self.remove_edge(random_edge[0], random_edge[1])
+        edges_to_absorb = self.edges(random_edge[1])
+        for vertex in self.vertices():
+            w = 0
+            has_edge = False
+            for _ in range(self.edges(vertex).count(random_edge[1])):
+                has_edge = True
+                w += self.weight(vertex, random_edge[1])
+                self.remove_edge(vertex, random_edge[1])
+            if has_edge:
+                self.add_edge(vertex, random_edge[0], w)
+
+        w = 0
+        for e in set(edges_to_absorb):
+            w += self.weight(random_edge[1], e)
+            self.remove_edge(random_edge[1], e)
+            self.add_edge(random_edge[0], e, w)
+        self.remove_vertex(random_edge[1])
+        
+        # remove self loops
+        for _ in range(self.edges(random_edge[0]).count(random_edge[0])):
+            self.remove_edge(random_edge[0], random_edge[0])
 
     def contract_random_undirected(self):
         random_edge = self.choose_random_edge()
@@ -222,7 +254,7 @@ class graph(object):
         self.remove_vertex(random_edge[1])
         
         # remove self loops
-        while random_edge[0] in self.graph[random_edge[0]]:
+        while random_edge[0] in self.adjacency_matrix[random_edge[0]]:
             self.remove_edge_undirected(random_edge[0], random_edge[0])
     
     def get_random_cut(self):
@@ -230,8 +262,8 @@ class graph(object):
             self.contract_random()
 
         r = []
-        for v in self.graph.keys:
-            r.append(self.graph[v])
+        for v in self.adjacency_matrix.keys:
+            r.append(self.adjacency_matrix[v])
         return r
     
     def get_random_cut_undirected(self):
@@ -239,8 +271,8 @@ class graph(object):
             self.contract_random_undirected()
 
         r = []
-        for v in self.graph.keys:
-            r.append(self.graph[v])
+        for v in self.adjacency_matrix.keys:
+            r.append(self.adjacency_matrix[v])
         return r
 
     # not sure if O(nlogn)

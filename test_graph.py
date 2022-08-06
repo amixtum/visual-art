@@ -17,9 +17,8 @@ g.add_edge(4, 3, 4)
 g.add_edge(5, 3, 4)
 g.add_edge(5, 2, 2)
 
-g.contract_random()
+g.contract_random_no_parallel()
 
 for v in g.vertices():
     print(g.djikstra(v))
     print(g.bfs(v))
-    print(g.dfs(v))
