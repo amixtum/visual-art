@@ -8,6 +8,8 @@ print(r)
 for n in r:
     t.insert(n)
 
-st_5 = t.find(5)
+for n in range(max(r)):
+    print(t.rank(t.find(n)))
 
-inorder_traverse((st_5))
+
+# inorder_traverse((st_5))

@@ -1,10 +1,10 @@
 class bst:
-    def __init__(self, data=None, parent=None, l_child=None, r_child=None):
+    def __init__(self, data=None, parent=None, l_child=None, r_child=None, size=1):
         self.data = data
         self.parent = parent
         self.l_child = l_child
         self.r_child = r_child
-        self.size = 0
+        self.size = size
     
     def empty(self):
         return self.data is None
@@ -27,7 +27,7 @@ class bst:
                         it = it.l_child
 
                     else:
-                        it.l_child = bst(data=item, parent=it, l_child=None, r_child=None)
+                        it.l_child = bst(data=item, parent=it, l_child=None, r_child=None, size=1)
                         return it.l_child
 
                 while item >= it.data:
@@ -37,7 +37,7 @@ class bst:
                         it = it.r_child
 
                     else:
-                        it.r_child = bst(data=item, parent=it, l_child=None, r_child=None)
+                        it.r_child = bst(data=item, parent=it, l_child=None, r_child=None, size=1)
                         return it.r_child
 
     def find(self, item):
@@ -188,26 +188,8 @@ class bst:
             return self.__select(node.r_child, index - a - 1)
     
     def rank(self, node):
-        if self.find(node) is not None:
-            if node.l_child is not None:
-                if node.is_root():
-                    return node.l_child.size + 1
-
-                else:
-                    if node.parent.r_child == node:
-                        return node.l_child.size + 1 + self.rank(node.parent)
-
-                    else:
-                        return node.l_child.size + 1
-
-            else:
-                if node.is_root():
-                    return 0
-
-                else:
-                    if node.parent.r_child == node:
-                        return self.rank(node.parent) + 1
-
+        if self.find(node.data) is not None:
+            pass
         else:
             return -1
 
