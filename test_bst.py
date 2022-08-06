@@ -11,5 +11,4 @@ for n in r:
 for n in range(max(r)):
     print(t.rank(t.find(n)))
 
-
 # inorder_traverse((st_5))

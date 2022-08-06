@@ -189,9 +189,17 @@ class bst:
     
     def rank(self, node):
         if self.find(node.data) is not None:
-            pass
+            return self.__rank(self, node.data)
+    
+    def __rank(self, node, x):
+        if node is None:
+            return 0
+
+        if node.data <= x:
+            return 1 + self.__rank(node.l_child, x) + self.__rank(node.r_child, x)
+
         else:
-            return -1
+            return self.__rank(node.l_child, x)
 
 
 def inorder_traverse(tree):
