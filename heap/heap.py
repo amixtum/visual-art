@@ -1,5 +1,4 @@
 from math import floor
-from turtle import left
 
 
 def parent(index):

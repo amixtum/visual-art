@@ -4,8 +4,8 @@ from queue import Queue
 from random import choice
 
 
-class graph:
-    def __init__(self) -> None:
+class graph(object):
+    def __init__(self):
         self.graph = {}
         self.edge_weights = {}
         self.dfs_label = 0
@@ -16,7 +16,6 @@ class graph:
         self.graph[vertex] = []
     
     def remove_vertex(self, vertex):
-        self.graph.pop(vertex)
         for edge in self.edges(vertex):
             self.edge_weights.pop((vertex, edge))
         for v in self.vertices():
@@ -25,6 +24,7 @@ class graph:
         for v in self.vertices():
             while vertex in self.edges(v):
                 self.edges(v).remove(vertex)
+        self.graph.pop(vertex)
     
     def add_edge(self, from_vertex, to_vertex, weight):
         self.graph[from_vertex].append(to_vertex)
@@ -47,7 +47,7 @@ class graph:
         self.edge_weights.pop((to_vertex, from_vertex))
     
     def vertices(self) -> list:
-        return self.graph.keys
+        return list(self.graph.keys())
 
     def edges(self, vertex) -> list:
         return self.graph[vertex]
@@ -76,7 +76,7 @@ class graph:
         return d
 
     def weight(self, from_vertex, to_vertex):
-        return self.edge_weights((from_vertex, to_vertex))
+        return self.edge_weights[(from_vertex, to_vertex)]
 
     def copy(self):
         c = graph()
@@ -87,17 +87,18 @@ class graph:
                 c.add_edge(vertex, edge)
         return c 
     
+    # not working
     def dfs(self, start_vertex, visited: dict = {}, connected: list = [], labels: dict = {}, finishing_times: dict = {}):
         if len(visited) == 0:
             for vertex in self.vertices():
                 visited[vertex] = False
 
-        visited[start_vertex] = True
-        connected.append(start_vertex)
-
-        for edge in self.edges(start_vertex):
-            if not visited[edge]:
-                self.dfs(edge, visited, connected, labels)
+        if not visited[start_vertex]:
+            visited[start_vertex] = True
+            connected.append(start_vertex)
+            for edge in self.edges(start_vertex):
+                if not visited[edge]:
+                    self.dfs(edge, visited, connected, labels, finishing_times)
         
         labels[start_vertex] = self.dfs_label
         self.dfs_label -= 1
@@ -183,7 +184,7 @@ class graph:
         return connected_component
 
     def choose_random_edge(self):
-        start = choice(self.graph.keys)
+        start = choice(list(self.graph.keys()))
         end = choice(self.graph[start])
         return (start, end)
 
@@ -193,18 +194,17 @@ class graph:
         self.remove_edge(random_edge[0], random_edge[1])
         edges_to_absorb = self.edges(random_edge[1])
         for vertex in self.vertices():
-            indices = []
-            adjust = 0
-            for index in range(len(self.edges(vertex))):
-                if self.edges(vertex)[index] == random_edge[1]:
-                    indices.append(index - adjust)
-                    adjust += 1
-            for index in indices:
-                self.remove_edge(vertex, self.edges(vertex).pop(index))
-                self.add_edge(vertex, random_edge[0])
+            w = 0
+            for _ in range(self.edges(vertex).count(random_edge[1])):
+                w += self.weight(vertex, random_edge[1])
+                self.remove_edge(vertex, random_edge[1])
+                self.add_edge(vertex, random_edge[0], w)
+
+        w = 0
         for e in edges_to_absorb:
+            w += self.weight(random_edge[1], e)
             self.remove_edge(random_edge[1], e)
-            self.add_edge(random_edge[0], e)
+            self.add_edge(random_edge[0], e, w)
         self.remove_vertex(random_edge[1])
         
         # remove self loops
