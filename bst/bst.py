@@ -1,17 +1,16 @@
 class bst:
-    def __init__(self, data=None, parent=None, l_child=None, r_child=None, rank=-1):
-        self.data = None
-        self.parent = None
-        self.l_child = None
-        self.r_child = None
+    def __init__(self, data=None, parent=None, l_child=None, r_child=None):
+        self.data = data
+        self.parent = parent
+        self.l_child = l_child
+        self.r_child = r_child
         self.size = 0
-        self.rank = -1
     
     def empty(self):
-        return self.data == None
+        return self.data is None
     
     def is_root(self):
-        return self.parent == None 
+        return self.parent is None 
     
     def insert(self, item):
         if self.empty():
@@ -28,7 +27,7 @@ class bst:
                         it = it.l_child
 
                     else:
-                        it.l_child = bst(data=item, parent=it, l_child=None, r_child=None, rank=it.rank - 1)
+                        it.l_child = bst(data=item, parent=it, l_child=None, r_child=None)
                         return it.l_child
 
                 while item >= it.data:
@@ -38,7 +37,7 @@ class bst:
                         it = it.r_child
 
                     else:
-                        it.r_child = bst(data=item, parent=it, l_child=None, r_child=None, rank=it.rank - 1)
+                        it.r_child = bst(data=item, parent=it, l_child=None, r_child=None)
                         return it.r_child
 
     def find(self, item):
@@ -94,13 +93,17 @@ class bst:
                         while it.l_child is not None:
                             it = it.l_child
                         return it 
+
                     else:
                         while it.data <= tree.data:
                             if it.parent is not None:
                                 it = it.parent
+
                             else:
                                 return None
+
                         return it
+
         else:
             return None
                     
