@@ -82,6 +82,27 @@ class bst:
                         return it
         else:
             return None
+
+    def successor(self, key):
+        it = self
+        tree = self.find(key)
+        done = False
+        if tree is not None:
+            while not done:
+                if tree.data == it.data:
+                    if it.r_child is not None:
+                        while it.l_child is not None:
+                            it = it.l_child
+                        return it 
+                    else:
+                        while it.data <= tree.data:
+                            if it.parent is not None:
+                                it = it.parent
+                            else:
+                                return None
+                        return it
+        else:
+            return None
                     
     def delete(self, item):
         to_delete = self.find(item)
