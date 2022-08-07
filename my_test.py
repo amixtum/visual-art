@@ -52,11 +52,11 @@ with Image.open('img/galaxy1.jpg') as img:
             updated = True
 
         elif inp == 'ph':
-            partition_horizontal(img, lambda c1, c2: compare_diff(c1, c2), 0, 0, img.width - 1, img.height - 1)
+            partition_horizontal(img, lambda c1, c2: compare_intensity(c1, c2), 0, 0, img.width - 1, img.height - 1)
             updated = True
 
         elif inp == 'pv':
-            partition_vertical(img, lambda c1, c2: compare_diff(c1, c2), 0, 0, img.width - 1, img.height - 1)
+            partition_vertical(img, lambda c1, c2: compare_intensity(c1, c2), 0, 0, img.width - 1, img.height - 1)
             updated = True
 
         elif inp == 'pd':

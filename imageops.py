@@ -67,32 +67,32 @@ def partition_strip_horizontal(img, color_compare, x_l, x_r, y):
 def partition_strip_diagonal(img, color_compare, x_l, y_l, x_r, y_r):
     p_index = randint(x_l, x_r)
 
-    m = 1
-    b = y_r - m * x_r
+    m = (y_r - y_l) / (x_r - x_l)
+    b = floor(y_r - m * x_r)
 
     pivot = img.getpixel((p_index, m * p_index + b))
 
-    swap_pixels(img, (x_l, m * x_l + b), (p_index, m * p_index + b))
+    swap_pixels(img, (x_l, floor(m * x_l + b)), (p_index, floor(m * p_index + b)))
 
-    top_left = (x_l + 1, m * (x_l + 1) + b)
-    bottom_right = (x_r, m * x_r + b)
+    top_left = (x_l + 1, floor(m * (x_l + 1) + b))
+    bottom_right = (x_r, floor(m * x_r + b))
 
     while top_left[0] < bottom_right[0]:
         while top_left[0] < x_r and m * top_left[0] + b < y_r and color_compare(img.getpixel(top_left), pivot) < 0:
             new_x = top_left[0] + 1
-            new_y = m * new_x + b
+            new_y = floor(m * new_x + b)
             top_left = (new_x, new_y)
 
         while bottom_right[0] > x_l and m * bottom_right[0] + b > y_l and color_compare(img.getpixel(bottom_right), pivot) >= 0:
             new_x = bottom_right[0] - 1
-            new_y = m * new_x + b
+            new_y = floor(m * new_x + b)
             bottom_right = (new_x, new_y)
 
         swap_pixels(img, top_left, bottom_right)
 
     swap_pixels(img, top_left, bottom_right)
 
-    swap_pixels(img, (x_l, m * x_l + b), bottom_right)
+    swap_pixels(img, (x_l, floor(m * x_l + b)), bottom_right)
 
     return bottom_right
 
@@ -102,24 +102,24 @@ def partition_diagonals(img, color_compare):
 
     while b >= 0:
         x_l = 0
-        y_l = m * x_l + b
+        y_l = int(m * x_l + b)
 
         x_r = floor((img.height - 1 - b) / m)
         y_r = img.height - 1
 
-        if y_l >= 0 and y_l < img.height and x_r >= 0 and x_r < img.width and y_r >= 0 and y_r < img.height:
+        if y_l >= 0 and y_l < img.height and x_r >= 0 and x_r < img.width and y_r >= 0 and y_r < img.height and x_l < x_r and y_l < y_r:
             partition_strip_diagonal(img, color_compare, x_l, y_l, x_r, y_r)
 
         b -= 1
     
-    while b >= -img.height + 2:
+    while b > -img.height + 2:
         y_l = 0
         x_l = floor((y_l - b) / m)
 
         x_r = img.width - 1
-        y_r = m * x_r + b
+        y_r = int(m * x_r) + b
 
-        if x_l >= 0 and x_l < img.width and y_l >= 0 and y_l < img.height and x_r >= 0 and x_r < img.width and y_r >= 0 and y_r < img.height:
+        if x_l >= 0 and x_l < img.width and y_l >= 0 and y_l < img.height and x_r >= 0 and x_r < img.width and y_r >= 0 and y_r < img.height and x_l < x_r and y_l < y_r:
             partition_strip_diagonal(img, color_compare, x_l, y_l, x_r, y_r)
 
         b -= 1
