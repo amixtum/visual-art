@@ -1,3 +1,4 @@
+from __future__ import barry_as_FLUFL
 from math import ceil, floor, sin, cos, pi
 
 
@@ -196,11 +197,69 @@ def apply_find_bluest_recursive_helper(img: Image, threshold: int, replacement: 
         if flip:
             apply_find_bluest_recursive_helper(img, threshold, replacement, x_start, y_start, x_mid, y_mid, False)
             apply_find_bluest_recursive_helper(img, threshold, replacement, x_mid, y_mid, x_end, y_end, False)
-            apply_find_bluest_range(img, threshold, replacement, x_mid, y_start, x_end, y_mid) 
+            apply_find_bluest_range(img, threshold, replacement, x_mid, y_start, x_end, y_mid)
             apply_find_bluest_range(img, threshold, replacement, x_start, y_mid, x_mid, y_end)
         else:
             apply_find_bluest_recursive_helper(img, threshold, replacement, x_mid, y_start, x_end, y_mid, True)
             apply_find_bluest_recursive_helper(img, threshold, replacement, x_start, y_mid, x_mid, y_end, True)
             apply_find_bluest_range(img, threshold, replacement, x_start, y_start, x_mid, y_mid)
             apply_find_bluest_range(img, threshold, replacement, x_mid, y_mid, x_end, y_end)
-        
+
+def compare_intensity(c1, c2):
+    c1_intensity = sum(c1) / 255 / 3
+    c2_intensity = sum(c2) / 255 / 3
+
+    if c1_intensity < c2_intensity:
+        return -1
+
+    elif c1_intensity == c2_intensity:
+        return 0
+
+    else:
+        return 1
+
+def compare_sin_intensity(c1, c2, epsilon):
+    c1_intensity = (2 * pi * sum(c1)) / 255 / 3
+    c2_intensity = (2 * pi * sum(c2)) / 255 / 3
+
+    if sin(c1_intensity) < sin(c2_intensity):
+        return -1
+
+    elif sin(c1_intensity) >= sin(c2_intensity) - epsilon and sin(c1_intensity) <= sin(c2_intensity) - epsilon:
+        return 0
+    
+    else:
+        return 1
+
+def more_blue(c1, c2):
+    if c1[2] < c2[2]:
+        return -1
+
+    elif c1[2] == c2[2]:
+        return 0
+
+    else:
+        return 1
+
+def compare_diff(c1, c2):
+    r_diff = abs(c1[0] - c2[0])
+    g_diff = abs(c1[1] - c2[1])
+    b_diff = abs(c1[2] - c2[2])
+
+    max_diff = max((r_diff, g_diff, b_diff))
+    min_diff = min((r_diff, g_diff, b_diff))
+
+    if max_diff == b_diff:
+        if min_diff == r_diff:
+            return -1
+        return 1
+    
+    elif max_diff == g_diff:
+        if min_diff == b_diff:
+            return 1
+        return 0
+
+    elif max_diff == r_diff:
+        if min_diff == g_diff:
+            return 0
+        return -1

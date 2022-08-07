@@ -188,8 +188,11 @@ class bst:
             return self.__select(node.r_child, index - a - 1)
     
     def rank(self, node):
-        if self.find(node.data) is not None:
-            return self.__rank(self, node.data)
+        if node is not None:
+            if self.find(node.data) is not None:
+                return self.__rank(self, node.data)
+            return -1
+        return -1
     
     def __rank(self, node, x):
         if node is None:

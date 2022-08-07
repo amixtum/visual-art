@@ -8,6 +8,8 @@ print(r)
 for n in r:
     t.insert(n)
 
+t.delete(5)
+
 for n in range(max(r)):
     print(t.rank(t.find(n)))
 
