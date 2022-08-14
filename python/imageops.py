@@ -1,7 +1,6 @@
 from math import ceil, floor
 
 from random import randint, choice
-from turtle import color
 
 
 from PIL import Image, ImageDraw
@@ -95,35 +94,6 @@ def partition_strip_diagonal(img, color_compare, x_l, y_l, x_r, y_r):
     swap_pixels(img, (x_l, floor(m * x_l + b)), bottom_right)
 
     return bottom_right
-
-def partition_diagonals(img, color_compare):
-    m = 1
-    b = img.height - 2
-
-    while b >= 0:
-        x_l = 0
-        y_l = int(m * x_l + b)
-
-        x_r = floor((img.height - 1 - b) / m)
-        y_r = img.height - 1
-
-        if y_l >= 0 and y_l < img.height and x_r >= 0 and x_r < img.width and y_r >= 0 and y_r < img.height and x_l < x_r and y_l < y_r:
-            partition_strip_diagonal(img, color_compare, x_l, y_l, x_r, y_r)
-
-        b -= 1
-    
-    while b > -img.height + 2:
-        y_l = 0
-        x_l = floor((y_l - b) / m)
-
-        x_r = img.width - 1
-        y_r = int(m * x_r) + b
-
-        if x_l >= 0 and x_l < img.width and y_l >= 0 and y_l < img.height and x_r >= 0 and x_r < img.width and y_r >= 0 and y_r < img.height and x_l < x_r and y_l < y_r:
-            partition_strip_diagonal(img, color_compare, x_l, y_l, x_r, y_r)
-
-        b -= 1
-    
 
 def partition_horizontal(img, color_compare, x_l, y_l, x_r, y_r):
     p_index = floor((x_r - x_l) / 2) + x_l + randint(-(floor((x_r - x_l) / 2)), floor((x_r - x_l) / 2))
